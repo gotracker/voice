@@ -69,9 +69,9 @@ type SampleReader16BitUnsigned struct {
 }
 
 // Read returns the next multichannel sample
-func (s *SampleReader16BitUnsigned) Read() (volume.Matrix, error) {
+func (s *SampleReader16BitUnsigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
 	var v Sample16BitUnsigned
-	return s.readData(&v)
+	return s.readData(&v, arg...)
 }
 
 // SampleReader16BitSigned is a signed 8-bit PCM sample reader
@@ -80,7 +80,7 @@ type SampleReader16BitSigned struct {
 }
 
 // Read returns the next multichannel sample
-func (s *SampleReader16BitSigned) Read() (volume.Matrix, error) {
+func (s *SampleReader16BitSigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
 	var v Sample16BitSigned
-	return s.readData(&v)
+	return s.readData(&v, arg...)
 }
