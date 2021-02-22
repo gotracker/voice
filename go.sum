@@ -1,0 +1,5 @@
+github.com/gotracker/gomixing v1.0.11 h1:9x1/pRPV8aoeaLDSz3LZ9YrSdEw+3JDQl5iBO+V8Ikg=
+github.com/gotracker/gomixing v1.0.11/go.mod h1:orU2G///ovcRkt4bdNZMhOPvHW0vl5yebXaLKqQcHWw=
+github.com/gotracker/opl2 v1.0.1 h1:1PVNs0dXqEAQxdws7fz2WEE3nSKkMb1osTTT7KgEi5g=
+github.com/gotracker/opl2 v1.0.1/go.mod h1:lW1WbZlh7svEMpurp9LLYWSyf1WPAb750cQ7xGIhCnY=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
