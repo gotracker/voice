@@ -99,6 +99,42 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 				data:      data,
 			},
 		}
+	case SampleDataFormat32BitLEFloat:
+		return &SampleReader32BitFloat{
+			SampleData: SampleData{
+				length:    length,
+				byteOrder: binary.LittleEndian,
+				channels:  channels,
+				data:      data,
+			},
+		}
+	case SampleDataFormat32BitBEFloat:
+		return &SampleReader32BitFloat{
+			SampleData: SampleData{
+				length:    length,
+				byteOrder: binary.BigEndian,
+				channels:  channels,
+				data:      data,
+			},
+		}
+	case SampleDataFormat64BitLEFloat:
+		return &SampleReader64BitFloat{
+			SampleData: SampleData{
+				length:    length,
+				byteOrder: binary.LittleEndian,
+				channels:  channels,
+				data:      data,
+			},
+		}
+	case SampleDataFormat64BitBEFloat:
+		return &SampleReader64BitFloat{
+			SampleData: SampleData{
+				length:    length,
+				byteOrder: binary.BigEndian,
+				channels:  channels,
+				data:      data,
+			},
+		}
 	default:
 		panic("unhandled sampler type")
 	}

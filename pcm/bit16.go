@@ -11,7 +11,7 @@ const (
 	cSample16BitBytes       = 2
 )
 
-// Sample16BitSigned is a signed 8-bit sample
+// Sample16BitSigned is a signed 16-bit sample
 type Sample16BitSigned int16
 
 // Volume returns the volume value for the sample
@@ -26,7 +26,7 @@ func (s Sample16BitSigned) Size() int {
 
 // ReadAt reads a value from the reader provided in the byte order provided
 func (s *Sample16BitSigned) ReadAt(d *SampleData, ofs int64) error {
-	if len(d.data) <= int(ofs)+1 {
+	if len(d.data) <= int(ofs)+(cSample16BitBytes-1) {
 		return io.EOF
 	}
 	if ofs < 0 {
@@ -37,7 +37,7 @@ func (s *Sample16BitSigned) ReadAt(d *SampleData, ofs int64) error {
 	return nil
 }
 
-// Sample16BitUnsigned is an unsigned 8-bit sample
+// Sample16BitUnsigned is an unsigned 16-bit sample
 type Sample16BitUnsigned uint16
 
 // Volume returns the volume value for the sample
@@ -52,7 +52,7 @@ func (s Sample16BitUnsigned) Size() int {
 
 // ReadAt reads a value from the reader provided in the byte order provided
 func (s *Sample16BitUnsigned) ReadAt(d *SampleData, ofs int64) error {
-	if len(d.data) <= int(ofs)+1 {
+	if len(d.data) <= int(ofs)+(cSample16BitBytes-1) {
 		return io.EOF
 	}
 	if ofs < 0 {
