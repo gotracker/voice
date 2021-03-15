@@ -19,11 +19,15 @@ type Sample interface {
 }
 
 // SampleData is the presentation of the core data of the sample
+type baseSampleData struct {
+	pos      int // in multichannel samples
+	length   int // in multichannel samples
+	channels int
+}
+
 type SampleData struct {
-	pos       int // in multichannel samples
-	length    int // in multichannel samples
+	baseSampleData
 	byteOrder binary.ByteOrder
-	channels  int
 	data      []byte
 }
 
@@ -49,95 +53,89 @@ func (s *SampleData) Tell() int {
 
 // NewSample constructs a sampler that can handle the requested sampler format
 func NewSample(data []byte, length int, channels int, format SampleDataFormat) Sample {
+	base := baseSampleData{
+		length:   length,
+		channels: channels,
+	}
 	switch format {
 	case SampleDataFormat8BitSigned:
 		return &SampleReader8BitSigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat8BitUnsigned:
 		return &SampleReader8BitUnsigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat16BitLESigned:
 		return &SampleReader16BitSigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat16BitLEUnsigned:
 		return &SampleReader16BitUnsigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat16BitBESigned:
 		return &SampleReader16BitSigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.BigEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.BigEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat16BitBEUnsigned:
 		return &SampleReader16BitUnsigned{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.BigEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.BigEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat32BitLEFloat:
 		return &SampleReader32BitFloat{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat32BitBEFloat:
 		return &SampleReader32BitFloat{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.BigEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.BigEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat64BitLEFloat:
 		return &SampleReader64BitFloat{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.LittleEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.LittleEndian,
+				data:           data,
 			},
 		}
 	case SampleDataFormat64BitBEFloat:
 		return &SampleReader64BitFloat{
 			SampleData: SampleData{
-				length:    length,
-				byteOrder: binary.BigEndian,
-				channels:  channels,
-				data:      data,
+				baseSampleData: base,
+				byteOrder:      binary.BigEndian,
+				data:           data,
 			},
 		}
 	default:
