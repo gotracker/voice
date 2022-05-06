@@ -12,11 +12,11 @@ const (
 )
 
 // Sample16BitSigned is a signed 16-bit sample
-type Sample16BitSigned int16
+type Sample16BitSigned struct{}
 
 // Volume returns the volume value for the sample
-func (s Sample16BitSigned) Volume() volume.Volume {
-	return volume.Volume(s) * cSample16BitVolumeCoeff
+func (s Sample16BitSigned) volume(v int16) volume.Volume {
+	return volume.Volume(v) * cSample16BitVolumeCoeff
 }
 
 // Size returns the size of the sample in bytes
@@ -25,24 +25,24 @@ func (s Sample16BitSigned) Size() int {
 }
 
 // ReadAt reads a value from the reader provided in the byte order provided
-func (s *Sample16BitSigned) ReadAt(d *SampleData, ofs int64) error {
+func (s Sample16BitSigned) ReadAt(d *SampleData, ofs int64) (volume.Volume, error) {
 	if len(d.data) <= int(ofs)+(cSample16BitBytes-1) {
-		return io.EOF
+		return 0, io.EOF
 	}
 	if ofs < 0 {
 		ofs = 0
 	}
 
-	*s = Sample16BitSigned(d.byteOrder.Uint16(d.data[ofs:]))
-	return nil
+	v := int16(d.byteOrder.Uint16(d.data[ofs:]))
+	return s.volume(v), nil
 }
 
 // Sample16BitUnsigned is an unsigned 16-bit sample
-type Sample16BitUnsigned uint16
+type Sample16BitUnsigned struct{}
 
 // Volume returns the volume value for the sample
-func (s Sample16BitUnsigned) Volume() volume.Volume {
-	return volume.Volume(int16(s-0x8000)) * cSample16BitVolumeCoeff
+func (s Sample16BitUnsigned) volume(v uint16) volume.Volume {
+	return volume.Volume(int16(v-0x8000)) * cSample16BitVolumeCoeff
 }
 
 // Size returns the size of the sample in bytes
@@ -51,36 +51,14 @@ func (s Sample16BitUnsigned) Size() int {
 }
 
 // ReadAt reads a value from the reader provided in the byte order provided
-func (s *Sample16BitUnsigned) ReadAt(d *SampleData, ofs int64) error {
+func (s Sample16BitUnsigned) ReadAt(d *SampleData, ofs int64) (volume.Volume, error) {
 	if len(d.data) <= int(ofs)+(cSample16BitBytes-1) {
-		return io.EOF
+		return 0, io.EOF
 	}
 	if ofs < 0 {
 		ofs = 0
 	}
 
-	*s = Sample16BitUnsigned(d.byteOrder.Uint16(d.data[ofs:]))
-	return nil
-}
-
-// SampleReader16BitUnsigned is an unsigned 8-bit PCM sample reader
-type SampleReader16BitUnsigned struct {
-	SampleData
-}
-
-// Read returns the next multichannel sample
-func (s *SampleReader16BitUnsigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
-	var v Sample16BitUnsigned
-	return s.readData(&v, arg...)
-}
-
-// SampleReader16BitSigned is a signed 8-bit PCM sample reader
-type SampleReader16BitSigned struct {
-	SampleData
-}
-
-// Read returns the next multichannel sample
-func (s *SampleReader16BitSigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
-	var v Sample16BitSigned
-	return s.readData(&v, arg...)
+	v := uint16(d.byteOrder.Uint16(d.data[ofs:]))
+	return s.volume(v), nil
 }

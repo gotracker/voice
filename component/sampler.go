@@ -16,8 +16,6 @@ type Sampler struct {
 	loopsEnabled bool
 	wholeLoop    loop.Loop
 	sustainLoop  loop.Loop
-
-	temp0, temp1 volume.Matrix
 }
 
 // Setup sets up the sampler
@@ -55,22 +53,21 @@ func (s *Sampler) Fadeout() {
 
 // GetSample returns a multi-channel sample at the specified position
 func (s *Sampler) GetSample(pos sampling.Pos) volume.Matrix {
-	v0 := s.getConvertedSample(pos.Pos, &s.temp0)
-	if len(v0) == 0 {
+	v0 := s.getConvertedSample(pos.Pos)
+	if v0.Channels == 0 {
 		if s.canLoop() {
-			v01 := s.getConvertedSample(pos.Pos, &s.temp1)
+			v01 := s.getConvertedSample(pos.Pos)
 			panic(v01)
 		}
 		return v0
 	}
+
 	if pos.Frac == 0 {
 		return v0
 	}
-	v1 := s.getConvertedSample(pos.Pos+1, &s.temp1)
-	for c, s := range v1 {
-		v0[c] += volume.Volume(pos.Frac) * (s - v0[c])
-	}
-	return v0
+
+	v1 := s.getConvertedSample(pos.Pos + 1)
+	return v0.Lerp(v1, pos.Frac)
 }
 
 func (s *Sampler) canLoop() bool {
@@ -85,7 +82,7 @@ func (s *Sampler) canLoop() bool {
 	return false
 }
 
-func (s *Sampler) getConvertedSample(pos int, temp0 *volume.Matrix) volume.Matrix {
+func (s *Sampler) getConvertedSample(pos int) volume.Matrix {
 	if s.sample == nil {
 		return volume.Matrix{}
 	}
@@ -93,16 +90,14 @@ func (s *Sampler) getConvertedSample(pos int, temp0 *volume.Matrix) volume.Matri
 	if pos >= sl && !s.canLoop() {
 		return volume.Matrix{}
 	}
+	opos := pos
 	pos, _ = loop.CalcLoopPos(s.wholeLoop, s.sustainLoop, pos, sl, s.keyOn)
+	_ = opos
 	if pos < 0 || pos >= sl {
 		return volume.Matrix{}
 	}
 	s.sample.Seek(pos)
-	ch := s.sample.Channels()
-	if len(*temp0) != ch {
-		*temp0 = make(volume.Matrix, ch)
-	}
-	data, err := s.sample.Read(*temp0)
+	data, err := s.sample.Read()
 	if err != nil {
 		return volume.Matrix{}
 	}

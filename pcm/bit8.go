@@ -12,11 +12,11 @@ const (
 )
 
 // Sample8BitSigned is a signed 8-bit sample
-type Sample8BitSigned int8
+type Sample8BitSigned struct{}
 
 // Volume returns the volume value for the sample
-func (s Sample8BitSigned) Volume() volume.Volume {
-	return volume.Volume(s) * cSample8BitVolumeCoeff
+func (s Sample8BitSigned) volume(v int8) volume.Volume {
+	return volume.Volume(v) * cSample8BitVolumeCoeff
 }
 
 // Size returns the size of the sample in bytes
@@ -25,24 +25,24 @@ func (s Sample8BitSigned) Size() int {
 }
 
 // ReadAt reads a value from the reader provided in the byte order provided
-func (s *Sample8BitSigned) ReadAt(d *SampleData, ofs int64) error {
+func (s Sample8BitSigned) ReadAt(d *SampleData, ofs int64) (volume.Volume, error) {
 	if len(d.data) <= int(ofs) {
-		return io.EOF
+		return 0, io.EOF
 	}
 	if ofs < 0 {
 		ofs = 0
 	}
 
-	*s = Sample8BitSigned(d.data[ofs])
-	return nil
+	v := int8(d.data[ofs])
+	return s.volume(v), nil
 }
 
 // Sample8BitUnsigned is an unsigned 8-bit sample
-type Sample8BitUnsigned uint8
+type Sample8BitUnsigned struct{}
 
 // Volume returns the volume value for the sample
-func (s Sample8BitUnsigned) Volume() volume.Volume {
-	return volume.Volume(int8(s-0x80)) * cSample8BitVolumeCoeff
+func (s Sample8BitUnsigned) volume(v uint8) volume.Volume {
+	return volume.Volume(int8(v-0x80)) * cSample8BitVolumeCoeff
 }
 
 // Size returns the size of the sample in bytes
@@ -51,36 +51,14 @@ func (s Sample8BitUnsigned) Size() int {
 }
 
 // ReadAt reads a value from the reader provided in the byte order provided
-func (s *Sample8BitUnsigned) ReadAt(d *SampleData, ofs int64) error {
+func (s Sample8BitUnsigned) ReadAt(d *SampleData, ofs int64) (volume.Volume, error) {
 	if len(d.data) <= int(ofs) {
-		return io.EOF
+		return 0, io.EOF
 	}
 	if ofs < 0 {
 		ofs = 0
 	}
 
-	*s = Sample8BitUnsigned(d.data[ofs])
-	return nil
-}
-
-// SampleReader8BitUnsigned is an unsigned 8-bit PCM sample reader
-type SampleReader8BitUnsigned struct {
-	SampleData
-}
-
-// Read returns the next multichannel sample
-func (s *SampleReader8BitUnsigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
-	var v Sample8BitUnsigned
-	return s.readData(&v, arg...)
-}
-
-// SampleReader8BitSigned is a signed 8-bit PCM sample reader
-type SampleReader8BitSigned struct {
-	SampleData
-}
-
-// Read returns the next multichannel sample
-func (s *SampleReader8BitSigned) Read(arg ...volume.Matrix) (volume.Matrix, error) {
-	var v Sample8BitSigned
-	return s.readData(&v, arg...)
+	v := uint8(d.data[ofs])
+	return s.volume(v), nil
 }

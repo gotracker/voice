@@ -59,7 +59,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 	}
 	switch format {
 	case SampleDataFormat8BitSigned:
-		return &SampleReader8BitSigned{
+		return &PCMReader[Sample8BitSigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -67,7 +67,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat8BitUnsigned:
-		return &SampleReader8BitUnsigned{
+		return &PCMReader[Sample8BitUnsigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -75,7 +75,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat16BitLESigned:
-		return &SampleReader16BitSigned{
+		return &PCMReader[Sample16BitSigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -83,7 +83,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat16BitLEUnsigned:
-		return &SampleReader16BitUnsigned{
+		return &PCMReader[Sample16BitUnsigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -91,7 +91,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat16BitBESigned:
-		return &SampleReader16BitSigned{
+		return &PCMReader[Sample16BitSigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.BigEndian,
@@ -99,7 +99,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat16BitBEUnsigned:
-		return &SampleReader16BitUnsigned{
+		return &PCMReader[Sample16BitUnsigned]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.BigEndian,
@@ -107,7 +107,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat32BitLEFloat:
-		return &SampleReader32BitFloat{
+		return &PCMReader[Sample32BitFloat]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -115,7 +115,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat32BitBEFloat:
-		return &SampleReader32BitFloat{
+		return &PCMReader[Sample32BitFloat]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.BigEndian,
@@ -123,7 +123,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat64BitLEFloat:
-		return &SampleReader64BitFloat{
+		return &PCMReader[Sample64BitFloat]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.LittleEndian,
@@ -131,7 +131,7 @@ func NewSample(data []byte, length int, channels int, format SampleDataFormat) S
 			},
 		}
 	case SampleDataFormat64BitBEFloat:
-		return &SampleReader64BitFloat{
+		return &PCMReader[Sample64BitFloat]{
 			SampleData: SampleData{
 				baseSampleData: base,
 				byteOrder:      binary.BigEndian,
@@ -148,11 +148,11 @@ func ConvertTo(from Sample, format SampleDataFormat) (Sample, error) {
 	length := from.Length()
 	channels := from.Channels()
 	for i := 0; i < length; i++ {
-		v, _ := from.Read() // ignore error
+		samp, _ := from.Read() // ignore error
 		for c := 0; c < channels; c++ {
 			var vol volume.Volume
-			if len(v) > c {
-				vol = v[c]
+			if samp.Channels > c {
+				vol = samp.StaticMatrix[c]
 			}
 			switch format {
 			case SampleDataFormat8BitUnsigned:
