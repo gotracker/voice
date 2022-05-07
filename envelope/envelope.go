@@ -5,30 +5,30 @@ import (
 )
 
 // State is the state information about an envelope
-type State struct {
+type State[T any] struct {
 	position int
 	length   int
 	stopped  bool
-	env      *Envelope
+	env      *Envelope[T]
 }
 
 // Stopped returns true if the envelope state is stopped
-func (e *State) Stopped() bool {
+func (e *State[T]) Stopped() bool {
 	return e.stopped
 }
 
 // Stop stops the envelope state
-func (e *State) Stop() {
+func (e *State[T]) Stop() {
 	e.stopped = true
 }
 
 // Envelope returns the envelope that the state is based on
-func (e *State) Envelope() *Envelope {
+func (e *State[T]) Envelope() *Envelope[T] {
 	return e.env
 }
 
 // Reset resets the envelope
-func (e *State) Reset(env *Envelope) {
+func (e *State[T]) Reset(env *Envelope[T]) {
 	e.env = env
 	if e.env == nil || !e.env.Enabled {
 		e.stopped = true
@@ -42,7 +42,7 @@ func (e *State) Reset(env *Envelope) {
 	}
 }
 
-func (e *State) calcLoopedPos(keyOn bool) (int, int, bool) {
+func (e *State[T]) calcLoopedPos(keyOn bool) (int, int, bool) {
 	nPoints := len(e.env.Values)
 	var looped bool
 	cur, _ := loop.CalcLoopPos(e.env.Loop, e.env.Sustain, e.position, nPoints, keyOn)
@@ -54,7 +54,7 @@ func (e *State) calcLoopedPos(keyOn bool) (int, int, bool) {
 }
 
 // GetCurrentValue returns the current value
-func (e *State) GetCurrentValue(keyOn bool) (EnvPoint, EnvPoint, float32) {
+func (e *State[T]) GetCurrentValue(keyOn bool) (*EnvPoint[T], *EnvPoint[T], float32) {
 	if e.stopped {
 		return nil, nil, 0
 	}
@@ -89,11 +89,11 @@ func (e *State) GetCurrentValue(keyOn bool) (EnvPoint, EnvPoint, float32) {
 	case t > 1:
 		t = 1
 	}
-	return cur, next, t
+	return &cur, &next, t
 }
 
 // Advance advances the state by 1 tick
-func (e *State) Advance(keyOn bool, prevKeyOn bool) bool {
+func (e *State[T]) Advance(keyOn bool, prevKeyOn bool) bool {
 	if e.stopped {
 		return false
 	}

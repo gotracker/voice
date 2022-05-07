@@ -223,7 +223,7 @@ func SetFilterEnvelopePosition(v Voice, pos int) {
 }
 
 // GetCurrentFilterEnvelope returns the filter envelope's current value, if the interface for it exists on the voice
-func GetCurrentFilterEnvelope(v Voice) float32 {
+func GetCurrentFilterEnvelope(v Voice) int8 {
 	if pe, ok := v.(FilterEnveloper); ok {
 		return pe.GetCurrentFilterEnvelope()
 	}

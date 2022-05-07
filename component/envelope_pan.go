@@ -10,14 +10,14 @@ import (
 // PanEnvelope is a spatial modulation envelope
 type PanEnvelope struct {
 	enabled   bool
-	state     envelope.State
+	state     envelope.State[panning.Position]
 	pan       panning.Position
 	keyOn     bool
 	prevKeyOn bool
 }
 
 // Reset resets the state to defaults based on the envelope provided
-func (e *PanEnvelope) Reset(env *envelope.Envelope) {
+func (e *PanEnvelope) Reset(env *envelope.Envelope[panning.Position]) {
 	e.state.Reset(env)
 	e.keyOn = false
 	e.prevKeyOn = false
@@ -71,12 +71,12 @@ func (e *PanEnvelope) update() {
 
 	y0 := panning.CenterAhead
 	if cur != nil {
-		cur.Value(&y0)
+		y0 = cur.Value()
 	}
 
 	y1 := panning.CenterAhead
 	if next != nil {
-		next.Value(&y1)
+		y1 = next.Value()
 	}
 
 	// TODO: perform an angular interpolation instead of a linear one.

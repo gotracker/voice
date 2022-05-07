@@ -5,18 +5,30 @@ import (
 	"github.com/gotracker/voice/loop"
 )
 
-// EnvPoint is a point for the envelope
-type EnvPoint interface {
-	Length() int
-	Value(out interface{})
-	Init(ticks int, value interface{})
-}
-
 // Envelope is an envelope for instruments
-type Envelope struct {
+type Envelope[T any] struct {
 	Enabled    bool
 	Loop       loop.Loop
 	Sustain    loop.Loop
-	Values     []EnvPoint
+	Values     []EnvPoint[T]
 	OnFinished voice.Callback
+}
+
+// EnvPoint is a point for the envelope
+type EnvPoint[T any] struct {
+	Ticks int
+	Y     T
+}
+
+func (p EnvPoint[T]) Length() int {
+	return p.Ticks
+}
+
+func (p EnvPoint[T]) Value() T {
+	return p.Y
+}
+
+func (p *EnvPoint[T]) Init(ticks int, value T) {
+	p.Ticks = ticks
+	p.Y = value
 }

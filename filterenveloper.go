@@ -4,6 +4,6 @@ package voice
 type FilterEnveloper interface {
 	EnableFilterEnvelope(enabled bool)
 	IsFilterEnvelopeEnabled() bool
-	GetCurrentFilterEnvelope() float32
+	GetCurrentFilterEnvelope() int8
 	SetFilterEnvelopePosition(pos int)
 }

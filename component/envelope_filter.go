@@ -8,14 +8,14 @@ import (
 // FilterEnvelope is a filter frequency cutoff modulation envelope
 type FilterEnvelope struct {
 	enabled   bool
-	state     envelope.State
-	value     float32
+	state     envelope.State[int8]
+	value     int8
 	keyOn     bool
 	prevKeyOn bool
 }
 
 // Reset resets the state to defaults based on the envelope provided
-func (e *FilterEnvelope) Reset(env *envelope.Envelope) {
+func (e *FilterEnvelope) Reset(env *envelope.Envelope[int8]) {
 	e.state.Reset(env)
 	e.keyOn = false
 	e.prevKeyOn = false
@@ -33,7 +33,7 @@ func (e *FilterEnvelope) IsEnabled() bool {
 }
 
 // GetCurrentValue returns the current cached envelope value
-func (e *FilterEnvelope) GetCurrentValue() float32 {
+func (e *FilterEnvelope) GetCurrentValue() int8 {
 	return e.value
 }
 
@@ -67,16 +67,15 @@ func (e *FilterEnvelope) Advance(keyOn bool, prevKeyOn bool) voice.Callback {
 func (e *FilterEnvelope) update() {
 	cur, next, t := e.state.GetCurrentValue(e.keyOn)
 
-	y0 := float32(0)
+	var y0 float32
 	if cur != nil {
-		cur.Value(&y0)
+		y0 = float32(cur.Value())
 	}
 
-	y1 := float32(0)
+	var y1 float32
 	if next != nil {
-		next.Value(&y1)
+		y1 = float32(next.Value())
 	}
 
-	e.value = y0 + t*(y1-y0)
-	e.value /= 256
+	e.value = int8(y0 + t*(y1-y0))
 }

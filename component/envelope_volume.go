@@ -10,14 +10,14 @@ import (
 // VolumeEnvelope is an amplitude modulation envelope
 type VolumeEnvelope struct {
 	enabled   bool
-	state     envelope.State
+	state     envelope.State[volume.Volume]
 	vol       volume.Volume
 	keyOn     bool
 	prevKeyOn bool
 }
 
 // Reset resets the state to defaults based on the envelope provided
-func (e *VolumeEnvelope) Reset(env *envelope.Envelope) {
+func (e *VolumeEnvelope) Reset(env *envelope.Envelope[volume.Volume]) {
 	e.state.Reset(env)
 	e.keyOn = false
 	e.prevKeyOn = false
@@ -69,14 +69,14 @@ func (e *VolumeEnvelope) Advance(keyOn bool, prevKeyOn bool) voice.Callback {
 func (e *VolumeEnvelope) update() {
 	cur, next, t := e.state.GetCurrentValue(e.keyOn)
 
-	y0 := volume.Volume(0)
+	var y0 volume.Volume
 	if cur != nil {
-		cur.Value(&y0)
+		y0 = cur.Value()
 	}
 
-	y1 := volume.Volume(0)
+	var y1 volume.Volume
 	if next != nil {
-		next.Value(&y1)
+		y1 = next.Value()
 	}
 
 	e.vol = y0 + volume.Volume(t)*(y1-y0)
