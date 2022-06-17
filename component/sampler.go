@@ -59,7 +59,7 @@ func (s *Sampler) GetSample(pos sampling.Pos) volume.Matrix {
 			v01 := s.getConvertedSample(pos.Pos)
 			panic(v01)
 		}
-		v0 = volume.Matrix{Channels: s.sample.Channels()}
+		return v0
 	}
 
 	if pos.Frac == 0 {

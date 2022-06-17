@@ -108,6 +108,7 @@ func (e *State[T]) Advance(keyOn bool, prevKeyOn bool) bool {
 		}
 	}
 
+loopAdvance:
 	e.length--
 	if e.length > 0 {
 		return false
@@ -125,5 +126,8 @@ func (e *State[T]) Advance(keyOn bool, prevKeyOn bool) bool {
 	}
 
 	e.length = e.env.Values[pos].Length()
+	if e.length <= 0 {
+		goto loopAdvance
+	}
 	return false
 }
